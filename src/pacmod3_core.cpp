@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-#include "pacmod3/pacmod3_core.hpp"
+#include "pacmod3_core/pacmod3_core.hpp"
 
 namespace pacmod3
 {
