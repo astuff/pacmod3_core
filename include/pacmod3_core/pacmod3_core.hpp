@@ -18,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PACMOD3__PACMOD3_CORE_HPP_
-#define PACMOD3__PACMOD3_CORE_HPP_
+#ifndef PACMOD3_CORE__PACMOD3_CORE_HPP_
+#define PACMOD3_CORE__PACMOD3_CORE_HPP_
 
 #include <cstring>
 #include <sstream>
@@ -893,4 +893,4 @@ public:
 
 }  // namespace pacmod3
 
-#endif  // PACMOD3__PACMOD3_CORE_HPP_
+#endif  // PACMOD3_CORE__PACMOD3_CORE_HPP_
