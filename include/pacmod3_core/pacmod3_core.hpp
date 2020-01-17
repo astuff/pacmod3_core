@@ -21,11 +21,11 @@
 #ifndef PACMOD3_CORE__PACMOD3_CORE_HPP_
 #define PACMOD3_CORE__PACMOD3_CORE_HPP_
 
-#include <cstring>
-#include <sstream>
+#include <array>
 #include <cstdint>
+#include <cstring>
 #include <memory>
-#include <vector>
+#include <sstream>
 #include <string>
 
 namespace pacmod3
@@ -83,14 +83,14 @@ enum class ComponentFunction
 class Pacmod3RxMsg
 {
 public:
-  std::vector<uint8_t> data;
+  std::array<uint8_t, 8> data = {0, 0, 0, 0, 0, 0, 0, 0};
 };
 
 class Pacmod3TxMsg
 {
 public:
   static std::shared_ptr<Pacmod3TxMsg> make_message(const uint32_t & can_id);
-  virtual void parse(const std::vector<uint8_t> & in) = 0;
+  virtual void parse(const uint8_t * in) = 0;
   virtual bool isSystem();
 };
 
@@ -163,7 +163,7 @@ public:
   bool command;
   bool output;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class SystemRptIntMsg
@@ -176,7 +176,7 @@ public:
   uint8_t command;
   uint8_t output;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class SystemRptFloatMsg
@@ -189,7 +189,7 @@ public:
   double command;
   double output;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class GlobalRptMsg
@@ -211,7 +211,7 @@ public:
   bool vehicle_can_timeout;
   uint16_t user_can_read_errors;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class ComponentRptMsg
@@ -228,7 +228,7 @@ public:
   uint8_t complement;
   bool config_fault;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class MotorRpt1Msg
@@ -240,7 +240,7 @@ public:
   double current;
   double position;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class MotorRpt2Msg
@@ -253,7 +253,7 @@ public:
   double motor_temp;
   double velocity;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class MotorRpt3Msg
@@ -265,7 +265,7 @@ public:
   double torque_output;
   double torque_input;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 // System Commands
@@ -547,7 +547,7 @@ public:
   bool raw_pedal_force_is_valid;
   bool user_interaction_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class BrakeAuxRptMsg
@@ -569,7 +569,7 @@ public:
   bool user_interaction_is_valid;
   bool brake_on_off_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class HeadlightAuxRptMsg
@@ -589,7 +589,7 @@ public:
   bool fog_lights_on_is_valid;
   bool headlights_mode_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class ShiftAuxRptMsg
@@ -609,7 +609,7 @@ public:
   bool brake_interlock_active_is_valid;
   bool speed_interlock_active_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class SteerAuxRptMsg
@@ -629,7 +629,7 @@ public:
   bool rotation_rate_is_valid;
   bool user_interaction_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class TurnAuxRptMsg
@@ -645,7 +645,7 @@ public:
   bool driver_blinker_bulb_on_is_valid;
   bool passenger_blinker_bulb_on_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class WiperAuxRptMsg
@@ -669,7 +669,7 @@ public:
   bool spray_near_empty_is_valid;
   bool spray_empty_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 // Other Reports
@@ -685,7 +685,7 @@ public:
   bool vehicle_speed_valid;
   uint8_t vehicle_speed_raw[2];
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class BrakeMotorRpt1Msg
@@ -743,7 +743,7 @@ public:
   double rear_left_wheel_speed;
   double rear_right_wheel_speed;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class YawRateRptMsg
@@ -756,7 +756,7 @@ public:
 
   double yaw_rate;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class LatLonHeadingRptMsg
@@ -775,7 +775,7 @@ public:
   uint32_t longitude_seconds;
   double heading;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class DateTimeRptMsg
@@ -793,7 +793,7 @@ public:
   uint8_t minute;
   uint8_t second;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class DetectedObjectRptMsg
@@ -807,7 +807,7 @@ public:
   double front_object_distance_low_res;
   double front_object_distance_high_res;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class VehicleSpecificRpt1Msg
@@ -821,7 +821,7 @@ public:
   uint8_t shift_pos_1;
   uint8_t shift_pos_2;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class VehicleDynamicsRptMsg
@@ -835,7 +835,7 @@ public:
   uint8_t g_forces;
   double brake_torque;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class VinRptMsg
@@ -852,7 +852,7 @@ public:
   uint32_t model_year;
   uint32_t serial;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class OccupancyRptMsg
@@ -876,7 +876,7 @@ public:
   bool rear_seatbelt_buckled;
   bool rear_seatbelt_buckled_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class InteriorLightsRptMsg
@@ -896,7 +896,7 @@ public:
   DimLevel dim_level;
   bool dim_level_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class DoorRptMsg
@@ -922,7 +922,7 @@ public:
   bool fuel_door_open;
   bool fuel_door_open_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 class RearLightsRptMsg
@@ -938,7 +938,7 @@ public:
   bool reverse_lights_on;
   bool reverse_lights_on_is_valid;
 
-  void parse(const std::vector<uint8_t> & in);
+  void parse(const uint8_t * in);
 };
 
 }  // namespace pacmod3
