@@ -66,18 +66,12 @@ elseif(${ROS_VERSION} EQUAL 2)
     src/pacmod3_core.cpp
   )
 
-  ament_export_include_directories(include)
-  ament_export_libraries(${PROJECT_NAME})
-
-  install(TARGETS ${PROJECT_NAME}
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
+  target_include_directories(${PROJECT_NAME} PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:include>"
   )
 
-  install(DIRECTORY include/
-    DESTINATION include
-  )
+  ament_export_interfaces(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 
   if(BUILD_TESTING)
     find_package(ament_lint_auto REQUIRED)
@@ -85,5 +79,17 @@ elseif(${ROS_VERSION} EQUAL 2)
   endif()
 
   ament_package()
+
+  install(DIRECTORY include/
+    DESTINATION include
+  )
+
+  install(TARGETS ${PROJECT_NAME}
+    EXPORT export_${PROJECT_NAME}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+  )
 
 endif()
