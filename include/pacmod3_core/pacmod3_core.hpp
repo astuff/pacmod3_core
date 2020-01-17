@@ -142,7 +142,7 @@ class SystemRptMsg
 public:
   SystemRptMsg();
 
-  bool isSystem();
+  bool isSystem() override;
 
   bool enabled;
   bool override_active;
@@ -196,6 +196,8 @@ class GlobalRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  GlobalRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x10;
 
   bool enabled;
@@ -216,6 +218,8 @@ class ComponentRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  ComponentRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x20;
 
   ComponentType component_type;
@@ -231,6 +235,8 @@ class MotorRpt1Msg
   : public Pacmod3TxMsg
 {
 public:
+  MotorRpt1Msg();
+
   double current;
   double position;
 
@@ -241,6 +247,8 @@ class MotorRpt2Msg
   : public Pacmod3TxMsg
 {
 public:
+  MotorRpt2Msg();
+
   double encoder_temp;
   double motor_temp;
   double velocity;
@@ -252,6 +260,8 @@ class MotorRpt3Msg
   : public Pacmod3TxMsg
 {
 public:
+  MotorRpt3Msg();
+
   double torque_output;
   double torque_input;
 
@@ -526,6 +536,8 @@ class AccelAuxRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  AccelAuxRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x300;
 
   float raw_pedal_pos;
@@ -542,6 +554,8 @@ class BrakeAuxRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  BrakeAuxRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x304;
 
   float raw_pedal_pos;
@@ -562,6 +576,8 @@ class HeadlightAuxRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  HeadlightAuxRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x318;
 
   bool headlights_on;
@@ -580,6 +596,8 @@ class ShiftAuxRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  ShiftAuxRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x328;
 
   bool between_gears;
@@ -598,6 +616,8 @@ class SteerAuxRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  SteerAuxRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x32C;
 
   float raw_position;
@@ -616,6 +636,8 @@ class TurnAuxRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  TurnAuxRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x330;
 
   bool driver_blinker_bulb_on;
@@ -630,6 +652,8 @@ class WiperAuxRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  WiperAuxRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x334;
 
   bool front_wiping;
@@ -653,6 +677,8 @@ class VehicleSpeedRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  VehicleSpeedRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x400;
 
   double vehicle_speed;
@@ -708,6 +734,8 @@ class WheelSpeedRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  WheelSpeedRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x407;
 
   double front_left_wheel_speed;
@@ -722,6 +750,8 @@ class YawRateRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  YawRateRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x40D;
 
   double yaw_rate;
@@ -733,6 +763,8 @@ class LatLonHeadingRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  LatLonHeadingRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x40E;
 
   int latitude_degrees;
@@ -750,6 +782,8 @@ class DateTimeRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  DateTimeRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x40F;
 
   uint32_t year;
@@ -766,6 +800,8 @@ class DetectedObjectRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  DetectedObjectRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x411;
 
   double front_object_distance_low_res;
@@ -778,6 +814,8 @@ class VehicleSpecificRpt1Msg
   : public Pacmod3TxMsg
 {
 public:
+  VehicleSpecificRpt1Msg();
+
   static constexpr uint32_t CAN_ID = 0x412;
 
   uint8_t shift_pos_1;
@@ -790,6 +828,8 @@ class VehicleDynamicsRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  VehicleDynamicsRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x413;
 
   uint8_t g_forces;
@@ -802,11 +842,13 @@ class VinRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  VinRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x414;
 
   std::string mfg_code;
   std::string mfg;
-  char model_year_code;
+  uint8_t model_year_code;
   uint32_t model_year;
   uint32_t serial;
 
@@ -817,6 +859,8 @@ class OccupancyRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  OccupancyRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x415;
 
   bool driver_seat_occupied;
@@ -839,6 +883,8 @@ class InteriorLightsRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  InteriorLightsRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x416;
 
   bool front_dome_lights_on;
@@ -857,6 +903,8 @@ class DoorRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  DoorRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x417;
 
   bool driver_door_open;
@@ -881,6 +929,8 @@ class RearLightsRptMsg
   : public Pacmod3TxMsg
 {
 public:
+  RearLightsRptMsg();
+
   static constexpr uint32_t CAN_ID = 0x418;
 
   bool brake_lights_on;

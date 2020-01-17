@@ -281,6 +281,20 @@ SystemRptFloatMsg::SystemRptFloatMsg()
 {}
 
 // TX Messages
+GlobalRptMsg::GlobalRptMsg()
+: Pacmod3TxMsg(),
+  enabled(false),
+  override_active(false),
+  fault_active(false),
+  config_fault_active(false),
+  user_can_timeout(false),
+  steering_can_timeout(false),
+  brake_can_timeout(false),
+  subsystem_can_timeout(false),
+  vehicle_can_timeout(false),
+  user_can_read_errors(0)
+{}
+
 void GlobalRptMsg::parse(const std::vector<uint8_t> & in)
 {
   enabled = in[0] & 0x01;
@@ -294,6 +308,15 @@ void GlobalRptMsg::parse(const std::vector<uint8_t> & in)
   vehicle_can_timeout = ((in[0] & 0x40) > 0);
   user_can_read_errors = ((in[6] << 8) | in[7]);
 }
+
+ComponentRptMsg::ComponentRptMsg()
+: Pacmod3TxMsg(),
+  component_type(ComponentType::PACMOD),
+  component_func(ComponentFunction::PACMOD),
+  counter(0),
+  complement(15),
+  config_fault(false)
+{}
 
 void ComponentRptMsg::parse(const std::vector<uint8_t> & in)
 {
@@ -356,6 +379,17 @@ void SystemRptFloatMsg::parse(const std::vector<uint8_t> & in)
   output = static_cast<double>(temp / 1000.0);
 }
 
+// Aux Reports
+AccelAuxRptMsg::AccelAuxRptMsg()
+: Pacmod3TxMsg(),
+  raw_pedal_pos(0),
+  raw_pedal_force(0),
+  user_interaction(false),
+  raw_pedal_pos_is_valid(false),
+  raw_pedal_force_is_valid(false),
+  user_interaction_is_valid(false)
+{}
+
 void AccelAuxRptMsg::parse(const std::vector<uint8_t> & in)
 {
   int16_t temp;
@@ -371,6 +405,20 @@ void AccelAuxRptMsg::parse(const std::vector<uint8_t> & in)
   raw_pedal_force_is_valid = (in[5] & 0x02) > 0;
   user_interaction_is_valid = (in[5] & 0x04) > 0;
 }
+
+BrakeAuxRptMsg::BrakeAuxRptMsg()
+: Pacmod3TxMsg(),
+  raw_pedal_pos(0),
+  raw_pedal_force(0),
+  raw_brake_pressure(0),
+  user_interaction(false),
+  brake_on_off(false),
+  raw_pedal_pos_is_valid(false),
+  raw_pedal_force_is_valid(false),
+  raw_brake_pressure_is_valid(false),
+  user_interaction_is_valid(false),
+  brake_on_off_is_valid(false)
+{}
 
 void BrakeAuxRptMsg::parse(const std::vector<uint8_t> & in)
 {
@@ -394,44 +442,17 @@ void BrakeAuxRptMsg::parse(const std::vector<uint8_t> & in)
   brake_on_off_is_valid = (in[7] & 0x10) > 0;
 }
 
-void DateTimeRptMsg::parse(const std::vector<uint8_t> & in)
-{
-  year = in[0];
-  month = in[1];
-  day = in[2];
-  hour = in[3];
-  minute = in[4];
-  second = in[5];
-}
-
-void DetectedObjectRptMsg::parse(const std::vector<uint8_t> & in)
-{
-  int16_t temp;
-
-  temp = ((static_cast<int16_t>(in[0]) << 8) | in[1]);
-  front_object_distance_low_res = static_cast<double>(temp / 1000.0);
-
-  temp = ((static_cast<int16_t>(in[2]) << 8) | in[3]);
-  front_object_distance_high_res = static_cast<double>(temp / 1000.0);
-}
-
-void DoorRptMsg::parse(const std::vector<uint8_t> & in)
-{
-  driver_door_open = ((in[0] & 0x01) > 0);
-  driver_door_open_is_valid = ((in[1] & 0x01) > 0);
-  passenger_door_open = ((in[0] & 0x02) > 0);
-  passenger_door_open_is_valid = ((in[1] & 0x02) > 0);
-  rear_driver_door_open = ((in[0] & 0x04) > 0);
-  rear_driver_door_open_is_valid = ((in[1] & 0x04) > 0);
-  rear_passenger_door_open = ((in[0] & 0x08) > 0);
-  rear_passenger_door_open_is_valid = ((in[1] & 0x08) > 0);
-  hood_open = ((in[0] & 0x10) > 0);
-  hood_open_is_valid = ((in[1] & 0x10) > 0);
-  trunk_open = ((in[0] & 0x20) > 0);
-  trunk_open_is_valid = ((in[1] & 0x20) > 0);
-  fuel_door_open = ((in[0] & 0x40) > 0);
-  fuel_door_open_is_valid = ((in[1] & 0x40) > 0);
-}
+HeadlightAuxRptMsg::HeadlightAuxRptMsg()
+: Pacmod3TxMsg(),
+  headlights_on(false),
+  headlights_on_bright(false),
+  fog_lights_on(false),
+  headlights_mode(0),
+  headlights_on_is_valid(false),
+  headlights_on_bright_is_valid(false),
+  fog_lights_on_is_valid(false),
+  headlights_mode_is_valid(false)
+{}
 
 void HeadlightAuxRptMsg::parse(const std::vector<uint8_t> & in)
 {
@@ -445,104 +466,17 @@ void HeadlightAuxRptMsg::parse(const std::vector<uint8_t> & in)
   headlights_mode_is_valid = (in[2] & 0x08) > 0;
 }
 
-void InteriorLightsRptMsg::parse(const std::vector<uint8_t> & in)
-{
-  front_dome_lights_on = ((in[0] & 0x01) > 0);
-  front_dome_lights_on_is_valid = ((in[2] & 0x01) > 0);
-  rear_dome_lights_on = ((in[0] & 0x02) > 0);
-  rear_dome_lights_on_is_valid = ((in[2] & 0x02) > 0);
-  mood_lights_on = ((in[0] & 0x04) > 0);
-  mood_lights_on_is_valid = ((in[2] & 0x04) > 0);
-  dim_level = (DimLevel)in[1];
-  dim_level_is_valid = ((in[2] & 0x08) > 0);
-}
-
-void LatLonHeadingRptMsg::parse(const std::vector<uint8_t> & in)
-{
-  latitude_degrees = static_cast<int8_t>(in[0]);
-  latitude_minutes = in[1];
-  latitude_seconds = in[2];
-  longitude_degrees = static_cast<int8_t>(in[3]);
-  longitude_minutes = in[4];
-  longitude_seconds = in[5];
-  heading = ((static_cast<int16_t>(in[6]) << 8) | in[7]) / 100.0;
-}
-
-void MotorRpt1Msg::parse(const std::vector<uint8_t> & in)
-{
-  int32_t temp;
-
-  temp =
-    (static_cast<int32_t>(in[0]) << 24) |
-    (static_cast<int32_t>(in[1]) << 16) |
-    (static_cast<int32_t>(in[2]) << 8) | in[3];
-  current = static_cast<double>(temp / 1000.0);
-
-  temp =
-    (static_cast<int32_t>(in[4]) << 24) |
-    (static_cast<int32_t>(in[5]) << 16) |
-    (static_cast<int32_t>(in[6]) << 8) | in[7];
-  position = static_cast<double>(temp / 1000.0);
-}
-
-void MotorRpt2Msg::parse(const std::vector<uint8_t> & in)
-{
-  int16_t temp16;
-  int32_t temp32;
-
-  temp16 = (static_cast<int16_t>(in[0]) << 8) | in[1];
-  encoder_temp = static_cast<double>(temp16);
-
-  temp16 = (static_cast<int16_t>(in[2]) << 8) | in[3];
-  motor_temp = static_cast<double>(temp16);
-
-  temp32 =
-    (static_cast<int32_t>(in[7]) << 24) |
-    (static_cast<int32_t>(in[6]) << 16) |
-    (static_cast<int32_t>(in[5]) << 8) | in[4];
-  velocity = static_cast<double>(temp32 / 10.0);
-}
-
-void MotorRpt3Msg::parse(const std::vector<uint8_t> & in)
-{
-  int32_t temp;
-
-  temp =
-    (static_cast<int32_t>(in[0]) << 24) |
-    (static_cast<int32_t>(in[1]) << 16) |
-    (static_cast<int32_t>(in[2]) << 8) | in[3];
-  torque_output = static_cast<double>(temp / 1000.0);
-
-  temp =
-    (static_cast<int32_t>(in[4]) << 24) |
-    (static_cast<int32_t>(in[5]) << 16) |
-    (static_cast<int32_t>(in[6]) << 8) | in[7];
-  torque_input = static_cast<double>(temp / 1000.0);
-}
-
-void OccupancyRptMsg::parse(const std::vector<uint8_t> & in)
-{
-  driver_seat_occupied = ((in[0] & 0x01) > 0);
-  driver_seat_occupied_is_valid = ((in[1] & 0x01) > 0);
-  passenger_seat_occupied = ((in[0] & 0x02) > 0);
-  passenger_seat_occupied_is_valid = ((in[1] & 0x02) > 0);
-  rear_seat_occupied = ((in[0] & 0x04) > 0);
-  rear_seat_occupied_is_valid = ((in[1] & 0x04) > 0);
-  driver_seatbelt_buckled = ((in[0] & 0x08) > 0);
-  driver_seatbelt_buckled_is_valid = ((in[1] & 0x08) > 0);
-  passenger_seatbelt_buckled = ((in[0] & 0x10) > 0);
-  passenger_seatbelt_buckled_is_valid = ((in[1] & 0x10) > 0);
-  rear_seatbelt_buckled = ((in[0] & 0x20) > 0);
-  rear_seatbelt_buckled_is_valid = ((in[1] & 0x20) > 0);
-}
-
-void RearLightsRptMsg::parse(const std::vector<uint8_t> & in)
-{
-  brake_lights_on = ((in[0] & 0x01) > 0);
-  brake_lights_on_is_valid = ((in[1] & 0x01) > 0);
-  reverse_lights_on = ((in[0] & 0x02) > 0);
-  reverse_lights_on_is_valid = ((in[1] & 0x02) > 0);
-}
+ShiftAuxRptMsg::ShiftAuxRptMsg()
+: Pacmod3TxMsg(),
+  between_gears(false),
+  stay_in_neutral_mode(false),
+  brake_interlock_active(false),
+  speed_interlock_active(false),
+  between_gears_is_valid(false),
+  stay_in_neutral_mode_is_valid(false),
+  brake_interlock_active_is_valid(false),
+  speed_interlock_active_is_valid(false)
+{}
 
 void ShiftAuxRptMsg::parse(const std::vector<uint8_t> & in)
 {
@@ -555,6 +489,18 @@ void ShiftAuxRptMsg::parse(const std::vector<uint8_t> & in)
   brake_interlock_active_is_valid = (in[1] & 0x04) > 0;
   speed_interlock_active_is_valid = (in[1] & 0x08) > 0;
 }
+
+SteerAuxRptMsg::SteerAuxRptMsg()
+: Pacmod3TxMsg(),
+  raw_position(0),
+  raw_torque(0),
+  rotation_rate(0),
+  user_interaction(false),
+  raw_position_is_valid(false),
+  raw_torque_is_valid(false),
+  rotation_rate_is_valid(false),
+  user_interaction_is_valid(false)
+{}
 
 void SteerAuxRptMsg::parse(const std::vector<uint8_t> & in)
 {
@@ -578,11 +524,310 @@ void SteerAuxRptMsg::parse(const std::vector<uint8_t> & in)
   user_interaction_is_valid = (in[7] & 0x08) > 0;
 }
 
+TurnAuxRptMsg::TurnAuxRptMsg()
+: Pacmod3TxMsg(),
+  driver_blinker_bulb_on(false),
+  passenger_blinker_bulb_on(false),
+  driver_blinker_bulb_on_is_valid(false),
+  passenger_blinker_bulb_on_is_valid(false)
+{}
+
+void TurnAuxRptMsg::parse(const std::vector<uint8_t> & in)
+{
+  driver_blinker_bulb_on = (in[0] & 0x01) > 0;
+  passenger_blinker_bulb_on = (in[0] & 0x02) > 0;
+  driver_blinker_bulb_on_is_valid = (in[1] & 0x01) > 0;
+  passenger_blinker_bulb_on_is_valid = (in[1] & 0x02) > 0;
+}
+
+WiperAuxRptMsg::WiperAuxRptMsg()
+: Pacmod3TxMsg(),
+  front_wiping(false),
+  front_spraying(false),
+  rear_wiping(false),
+  rear_spraying(false),
+  spray_near_empty(false),
+  spray_empty(false),
+  front_wiping_is_valid(false),
+  front_spraying_is_valid(false),
+  rear_wiping_is_valid(false),
+  rear_spraying_is_valid(false),
+  spray_near_empty_is_valid(false),
+  spray_empty_is_valid(false)
+{}
+
+void WiperAuxRptMsg::parse(const std::vector<uint8_t> & in)
+{
+  front_wiping = (in[0] & 0x01) > 0;
+  front_spraying = (in[0] & 0x02) > 0;
+  rear_wiping = (in[0] & 0x04) > 0;
+  rear_spraying = (in[0] & 0x08) > 0;
+  spray_near_empty = (in[0] & 0x10) > 0;
+  spray_empty = (in[0] & 0x20) > 0;
+  front_wiping_is_valid = (in[1] & 0x01) > 0;
+  front_spraying_is_valid = (in[1] & 0x02) > 0;
+  rear_wiping_is_valid = (in[1] & 0x04) > 0;
+  rear_spraying_is_valid = (in[1] & 0x08) > 0;
+  spray_near_empty_is_valid = (in[1] & 0x10) > 0;
+  spray_empty_is_valid = (in[1] & 0x20) > 0;
+}
+
+// Other Reports
+DateTimeRptMsg::DateTimeRptMsg()
+: Pacmod3TxMsg(),
+  year(0),
+  month(0),
+  day(0),
+  hour(0),
+  minute(0),
+  second(0)
+{}
+
+void DateTimeRptMsg::parse(const std::vector<uint8_t> & in)
+{
+  year = in[0];
+  month = in[1];
+  day = in[2];
+  hour = in[3];
+  minute = in[4];
+  second = in[5];
+}
+
+DetectedObjectRptMsg::DetectedObjectRptMsg()
+: Pacmod3TxMsg(),
+  front_object_distance_low_res(0),
+  front_object_distance_high_res(0)
+{}
+
+void DetectedObjectRptMsg::parse(const std::vector<uint8_t> & in)
+{
+  int16_t temp;
+
+  temp = ((static_cast<int16_t>(in[0]) << 8) | in[1]);
+  front_object_distance_low_res = static_cast<double>(temp / 1000.0);
+
+  temp = ((static_cast<int16_t>(in[2]) << 8) | in[3]);
+  front_object_distance_high_res = static_cast<double>(temp / 1000.0);
+}
+
+DoorRptMsg::DoorRptMsg()
+: Pacmod3TxMsg(),
+  driver_door_open(false),
+  driver_door_open_is_valid(false),
+  passenger_door_open(false),
+  passenger_door_open_is_valid(false),
+  rear_driver_door_open(false),
+  rear_driver_door_open_is_valid(false),
+  rear_passenger_door_open(false),
+  rear_passenger_door_open_is_valid(false),
+  hood_open(false),
+  hood_open_is_valid(false),
+  trunk_open(false),
+  trunk_open_is_valid(false),
+  fuel_door_open(false),
+  fuel_door_open_is_valid(false)
+{}
+
+void DoorRptMsg::parse(const std::vector<uint8_t> & in)
+{
+  driver_door_open = ((in[0] & 0x01) > 0);
+  driver_door_open_is_valid = ((in[1] & 0x01) > 0);
+  passenger_door_open = ((in[0] & 0x02) > 0);
+  passenger_door_open_is_valid = ((in[1] & 0x02) > 0);
+  rear_driver_door_open = ((in[0] & 0x04) > 0);
+  rear_driver_door_open_is_valid = ((in[1] & 0x04) > 0);
+  rear_passenger_door_open = ((in[0] & 0x08) > 0);
+  rear_passenger_door_open_is_valid = ((in[1] & 0x08) > 0);
+  hood_open = ((in[0] & 0x10) > 0);
+  hood_open_is_valid = ((in[1] & 0x10) > 0);
+  trunk_open = ((in[0] & 0x20) > 0);
+  trunk_open_is_valid = ((in[1] & 0x20) > 0);
+  fuel_door_open = ((in[0] & 0x40) > 0);
+  fuel_door_open_is_valid = ((in[1] & 0x40) > 0);
+}
+
+InteriorLightsRptMsg::InteriorLightsRptMsg()
+: Pacmod3TxMsg(),
+  front_dome_lights_on(false),
+  front_dome_lights_on_is_valid(false),
+  rear_dome_lights_on(false),
+  rear_dome_lights_on_is_valid(false),
+  mood_lights_on(false),
+  mood_lights_on_is_valid(false),
+  dim_level(DimLevel::DIM_LEVEL_MIN),
+  dim_level_is_valid(false)
+{}
+
+void InteriorLightsRptMsg::parse(const std::vector<uint8_t> & in)
+{
+  front_dome_lights_on = ((in[0] & 0x01) > 0);
+  front_dome_lights_on_is_valid = ((in[2] & 0x01) > 0);
+  rear_dome_lights_on = ((in[0] & 0x02) > 0);
+  rear_dome_lights_on_is_valid = ((in[2] & 0x02) > 0);
+  mood_lights_on = ((in[0] & 0x04) > 0);
+  mood_lights_on_is_valid = ((in[2] & 0x04) > 0);
+  dim_level = (DimLevel)in[1];
+  dim_level_is_valid = ((in[2] & 0x08) > 0);
+}
+
+LatLonHeadingRptMsg::LatLonHeadingRptMsg()
+: Pacmod3TxMsg(),
+  latitude_degrees(0),
+  latitude_minutes(0),
+  latitude_seconds(0),
+  longitude_degrees(0),
+  longitude_minutes(0),
+  longitude_seconds(0),
+  heading(0)
+{}
+
+void LatLonHeadingRptMsg::parse(const std::vector<uint8_t> & in)
+{
+  latitude_degrees = static_cast<int8_t>(in[0]);
+  latitude_minutes = in[1];
+  latitude_seconds = in[2];
+  longitude_degrees = static_cast<int8_t>(in[3]);
+  longitude_minutes = in[4];
+  longitude_seconds = in[5];
+  heading = ((static_cast<int16_t>(in[6]) << 8) | in[7]) / 100.0;
+}
+
+MotorRpt1Msg::MotorRpt1Msg()
+: Pacmod3TxMsg(),
+  current(0),
+  position(0)
+{}
+
+void MotorRpt1Msg::parse(const std::vector<uint8_t> & in)
+{
+  int32_t temp;
+
+  temp =
+    (static_cast<int32_t>(in[0]) << 24) |
+    (static_cast<int32_t>(in[1]) << 16) |
+    (static_cast<int32_t>(in[2]) << 8) | in[3];
+  current = static_cast<double>(temp / 1000.0);
+
+  temp =
+    (static_cast<int32_t>(in[4]) << 24) |
+    (static_cast<int32_t>(in[5]) << 16) |
+    (static_cast<int32_t>(in[6]) << 8) | in[7];
+  position = static_cast<double>(temp / 1000.0);
+}
+
+MotorRpt2Msg::MotorRpt2Msg()
+: Pacmod3TxMsg(),
+  encoder_temp(0),
+  motor_temp(0),
+  velocity(0)
+{}
+
+void MotorRpt2Msg::parse(const std::vector<uint8_t> & in)
+{
+  int16_t temp16;
+  int32_t temp32;
+
+  temp16 = (static_cast<int16_t>(in[0]) << 8) | in[1];
+  encoder_temp = static_cast<double>(temp16);
+
+  temp16 = (static_cast<int16_t>(in[2]) << 8) | in[3];
+  motor_temp = static_cast<double>(temp16);
+
+  temp32 =
+    (static_cast<int32_t>(in[7]) << 24) |
+    (static_cast<int32_t>(in[6]) << 16) |
+    (static_cast<int32_t>(in[5]) << 8) | in[4];
+  velocity = static_cast<double>(temp32 / 10.0);
+}
+
+MotorRpt3Msg::MotorRpt3Msg()
+: Pacmod3TxMsg(),
+  torque_output(0),
+  torque_input(0)
+{}
+
+void MotorRpt3Msg::parse(const std::vector<uint8_t> & in)
+{
+  int32_t temp;
+
+  temp =
+    (static_cast<int32_t>(in[0]) << 24) |
+    (static_cast<int32_t>(in[1]) << 16) |
+    (static_cast<int32_t>(in[2]) << 8) | in[3];
+  torque_output = static_cast<double>(temp / 1000.0);
+
+  temp =
+    (static_cast<int32_t>(in[4]) << 24) |
+    (static_cast<int32_t>(in[5]) << 16) |
+    (static_cast<int32_t>(in[6]) << 8) | in[7];
+  torque_input = static_cast<double>(temp / 1000.0);
+}
+
+OccupancyRptMsg::OccupancyRptMsg()
+: Pacmod3TxMsg(),
+  driver_seat_occupied(false),
+  driver_seat_occupied_is_valid(false),
+  passenger_seat_occupied(false),
+  passenger_seat_occupied_is_valid(false),
+  rear_seat_occupied(false),
+  rear_seat_occupied_is_valid(false),
+  driver_seatbelt_buckled(false),
+  driver_seatbelt_buckled_is_valid(false),
+  passenger_seatbelt_buckled(false),
+  passenger_seatbelt_buckled_is_valid(false),
+  rear_seatbelt_buckled(false),
+  rear_seatbelt_buckled_is_valid(false)
+{}
+
+void OccupancyRptMsg::parse(const std::vector<uint8_t> & in)
+{
+  driver_seat_occupied = ((in[0] & 0x01) > 0);
+  driver_seat_occupied_is_valid = ((in[1] & 0x01) > 0);
+  passenger_seat_occupied = ((in[0] & 0x02) > 0);
+  passenger_seat_occupied_is_valid = ((in[1] & 0x02) > 0);
+  rear_seat_occupied = ((in[0] & 0x04) > 0);
+  rear_seat_occupied_is_valid = ((in[1] & 0x04) > 0);
+  driver_seatbelt_buckled = ((in[0] & 0x08) > 0);
+  driver_seatbelt_buckled_is_valid = ((in[1] & 0x08) > 0);
+  passenger_seatbelt_buckled = ((in[0] & 0x10) > 0);
+  passenger_seatbelt_buckled_is_valid = ((in[1] & 0x10) > 0);
+  rear_seatbelt_buckled = ((in[0] & 0x20) > 0);
+  rear_seatbelt_buckled_is_valid = ((in[1] & 0x20) > 0);
+}
+
+RearLightsRptMsg::RearLightsRptMsg()
+: Pacmod3TxMsg(),
+  brake_lights_on(false),
+  brake_lights_on_is_valid(false),
+  reverse_lights_on(false),
+  reverse_lights_on_is_valid(false)
+{}
+
+void RearLightsRptMsg::parse(const std::vector<uint8_t> & in)
+{
+  brake_lights_on = ((in[0] & 0x01) > 0);
+  brake_lights_on_is_valid = ((in[1] & 0x01) > 0);
+  reverse_lights_on = ((in[0] & 0x02) > 0);
+  reverse_lights_on_is_valid = ((in[1] & 0x02) > 0);
+}
+
+VehicleSpecificRpt1Msg::VehicleSpecificRpt1Msg()
+: Pacmod3TxMsg(),
+  shift_pos_1(0),
+  shift_pos_2(0)
+{}
+
 void VehicleSpecificRpt1Msg::parse(const std::vector<uint8_t> & in)
 {
   shift_pos_1 = in[0];
   shift_pos_2 = in[1];
 }
+
+VehicleDynamicsRptMsg::VehicleDynamicsRptMsg()
+: Pacmod3TxMsg(),
+  g_forces(0),
+  brake_torque(0)
+{}
 
 void VehicleDynamicsRptMsg::parse(const std::vector<uint8_t> & in)
 {
@@ -593,6 +838,13 @@ void VehicleDynamicsRptMsg::parse(const std::vector<uint8_t> & in)
 
   g_forces = in[0];
 }
+
+VehicleSpeedRptMsg::VehicleSpeedRptMsg()
+: Pacmod3TxMsg(),
+  vehicle_speed(0),
+  vehicle_speed_valid(false),
+  vehicle_speed_raw("")
+{}
 
 void VehicleSpeedRptMsg::parse(const std::vector<uint8_t> & in)
 {
@@ -605,6 +857,15 @@ void VehicleSpeedRptMsg::parse(const std::vector<uint8_t> & in)
   vehicle_speed_raw[0] = in[3];
   vehicle_speed_raw[1] = in[4];
 }
+
+VinRptMsg::VinRptMsg()
+: Pacmod3TxMsg(),
+  mfg_code(""),
+  mfg(""),
+  model_year_code(0),
+  model_year(0),
+  serial(0)
+{}
 
 void VinRptMsg::parse(const std::vector<uint8_t> & in)
 {
@@ -703,6 +964,14 @@ void VinRptMsg::parse(const std::vector<uint8_t> & in)
   serial = (serial << 8) | in[6];
 }
 
+WheelSpeedRptMsg::WheelSpeedRptMsg()
+: Pacmod3TxMsg(),
+  front_left_wheel_speed(0),
+  front_right_wheel_speed(0),
+  rear_left_wheel_speed(0),
+  rear_right_wheel_speed(0)
+{}
+
 void WheelSpeedRptMsg::parse(const std::vector<uint8_t> & in)
 {
   int16_t temp;
@@ -720,21 +989,10 @@ void WheelSpeedRptMsg::parse(const std::vector<uint8_t> & in)
   rear_right_wheel_speed = static_cast<double>(temp / 100.0);
 }
 
-void WiperAuxRptMsg::parse(const std::vector<uint8_t> & in)
-{
-  front_wiping = (in[0] & 0x01) > 0;
-  front_spraying = (in[0] & 0x02) > 0;
-  rear_wiping = (in[0] & 0x04) > 0;
-  rear_spraying = (in[0] & 0x08) > 0;
-  spray_near_empty = (in[0] & 0x10) > 0;
-  spray_empty = (in[0] & 0x20) > 0;
-  front_wiping_is_valid = (in[1] & 0x01) > 0;
-  front_spraying_is_valid = (in[1] & 0x02) > 0;
-  rear_wiping_is_valid = (in[1] & 0x04) > 0;
-  rear_spraying_is_valid = (in[1] & 0x08) > 0;
-  spray_near_empty_is_valid = (in[1] & 0x10) > 0;
-  spray_empty_is_valid = (in[1] & 0x20) > 0;
-}
+YawRateRptMsg::YawRateRptMsg()
+: Pacmod3TxMsg(),
+  yaw_rate(0)
+{}
 
 void YawRateRptMsg::parse(const std::vector<uint8_t> & in)
 {
