@@ -19,7 +19,6 @@
 // THE SOFTWARE.
 
 #include <memory>
-#include <vector>
 
 #include "pacmod3_core/pacmod3_core.hpp"
 
